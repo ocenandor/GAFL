@@ -8,10 +8,15 @@
 *.ipynb*
 
 # logs files
-logs_*/
+logs*/
+*.csv*
 
 # saved models pth files
 models_*/
 
 # plots
 plots*/
+
+# weights
+*.pth*
+
