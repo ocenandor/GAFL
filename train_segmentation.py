@@ -26,7 +26,7 @@ make_reproducible(seed=0)
 def main(args):
     device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu')
 
-    params = get_params()
+    params = get_params(args.config)
     params.update({'random_seed': args.random_seed})
 
     transform = torchvision.transforms.Compose([Resize(size=params['image_size']), ToTensor(encode_map=True)])
@@ -37,7 +37,7 @@ def main(args):
 
     model = UNet(n_channels=1, n_classes=2,
                  init_features=params['init_features'], depth=params['depth'],
-                 image_size=params['image_size'], adaptive_layer_type=params['adaptive_layer']).to(device)
+                 image_size=params['image_size'], adaptive_layer_type=params['adaptive_layer'], multi_gafl=[params['positions'], []]).to(device)
     print_model_info(model, params)
 
     criterion = CombinedLoss([CrossEntropyLoss(), MultilabelDiceLoss()], [0.4, 0.6])

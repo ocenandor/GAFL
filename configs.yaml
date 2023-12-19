@@ -1,5 +1,5 @@
 paths:
-    data: ../data/BUSI # path to folder with train data
+    data: ../data/BPUI # path to folder with train data
     log_dir: logs/ # path to folder where the results of experiments from the tensorboard will be recorded
 
 data_parameters:
@@ -10,10 +10,14 @@ data_parameters:
 model_parameters:
     AdaptiveLayer:
         adjustment: spectrum # None, spectrum, spectrum_log, phase or general_spectrum adaptive adjustment layer
+        positions:
+            - 0
+            - 1
+            - 2
     segmentation:
         UNet:
             init_features: 32 # number of channels (features) in initial conv
-            depth: 3 # number of downsteps
+            depth: 3 # number of downsteps            
     classification:
         ResNet:
             blocks: 3, 3, 3 # numbers of blocks stacked at the building blocks

@@ -3,8 +3,8 @@ import yaml
 import argparse
 
 
-def get_params():
-    with open(os.path.join("configs.yaml"), "r") as config_file:
+def get_params(config):
+    with open(os.path.join(config), "r") as config_file:
         configs = yaml.load(config_file, Loader=yaml.FullLoader)
 
     params = {}
@@ -18,6 +18,9 @@ def get_params():
     params.update({'adaptive_layer': configs['model_parameters']['AdaptiveLayer']['adjustment']})
     if params['adaptive_layer'] == 'None':
         params['adaptive_layer'] = None
+        params.update({'positions': None})
+    else:
+        params.update({'positions': configs['model_parameters']['AdaptiveLayer']['positions']})
 
     params.update({'init_features': int(configs['model_parameters']['segmentation']['UNet']['init_features']),
                    'depth': int(configs['model_parameters']['segmentation']['UNet']['depth'])})
@@ -40,5 +43,6 @@ def parse_args():
     parser.add_argument('-d', '--device', type=int, default=0, help='cuda device id number')
     parser.add_argument('-rs', '--random_seed', type=int, default=1, help='random seed')
     parser.add_argument('--nolog', action='store_true', help='turn off logging')
+    parser.add_argument('-f',  '--config', help='config file', type=str, default='configs.yaml')
 
     return parser.parse_args()
