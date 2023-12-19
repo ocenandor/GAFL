@@ -22,11 +22,11 @@ class UNet(torch.nn.Module):
         self.adaptive_layer_type = adaptive_layer_type
 
         self.down_path = torch.nn.ModuleList()
-        if 0 in multi_gafl[0] and self.adaptive_layer_type is not None:
+        if self.adaptive_layer_type is not None and 0 in multi_gafl[0]:
             self.down_path.append(self.get_adaptive_layer(n_channels, image_size, self.adaptive_layer_type))
         self.down_path.append(double_conv(n_channels, self.features, self.features))
         for i in range(1, self.depth):
-            if 0 in multi_gafl[0] and self.adaptive_layer_type is not None:
+            if self.adaptive_layer_type is not None and i in multi_gafl[0]:
                 self.down_path.append(self.get_adaptive_layer(self.features,
                                                               (image_size[0] // 2 ** (i - 1), image_size[1] // 2 ** (i - 1)),
                                                               self.adaptive_layer_type))  
