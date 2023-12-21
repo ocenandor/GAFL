@@ -8,7 +8,9 @@ class AdaptiveLayer(torch.nn.Module):
         self.size = size
         self.adjustment = adjustment
 
-        filter_size = self.size[:-1] + (self.size[-1] // 2 + 1,)
+        filter_size = self.size[:-1] + (self.size[-1] // 2 + 1,) # 1 x 256 x 129 
+        #print('init adapt l', filter_size)
+        # THIS IS THE PARAM WE'LL LEARN
         self.register_parameter(name='frequency_filter',
                                 param=torch.nn.Parameter(torch.empty(filter_size)))
 
@@ -34,12 +36,13 @@ class AdaptiveLayer(torch.nn.Module):
                              imag=torch.sin(weights) * rft_tensor.real + torch.cos(weights) * rft_tensor.imag)
 
     def forward(self, x):
-        weights_size = (x.shape[0],) + tuple(1 for _ in range(len(self.size)))
+        weights_size = (x.shape[0],) + tuple(1 for _ in range(len(self.size))) # self.size=(1, 256, 256) , x.shape[0] = batch_size
         transformed_dimensions = tuple([dim for dim in range(1, len(weights_size))])
 
         rft_x = torch.fft.rfftn(x, dim=transformed_dimensions)
+        #print(rft_x.shape)
         if self.adjustment in ('spectrum', 'spectrum_log'):
-            w = torch.nn.ReLU()(self.frequency_filter.repeat(weights_size).to(x.device))
+            w = torch.nn.ReLU()(self.frequency_filter.repeat(weights_size).to(x.device)) # WE make w = matrix of copies of our learnable filter
             if self.adjustment == 'spectrum':
                 adjusted_rft_x = self.spectrum_adjustment(rft_x, w)
             elif self.adjustment == 'spectrum_log':
@@ -60,7 +63,7 @@ class GeneralAdaptiveLayer(torch.nn.Module):
         self.size = size
         self.adjustment = adjustment
 
-        filter_size = self.size[:-1] + (self.size[-1] // 2 + 1,)
+        filter_size = self.size[:-1] + (self.size[-1] // 2 + 1,) # 1 x 256 x 129 
         self.register_parameter(name='W1', param=torch.nn.Parameter(torch.empty(filter_size)))
         self.register_parameter(name='B1', param=torch.nn.Parameter(torch.empty(filter_size)))
         self.register_parameter(name='W2', param=torch.nn.Parameter(torch.empty(filter_size)))
@@ -93,6 +96,21 @@ class GeneralAdaptiveLayer(torch.nn.Module):
         return torch.where(spectrum == torch.tensor(0.0),
                            rft_tensor,
                            (rft_tensor / (spectrum + 1e-16)) * (w2 * activation(w1 * spectrum + b1) + b2))
+                           
+    @staticmethod
+    def general_spectrum_log_adjustment(rft_tensor, weights, activation):
+        
+        w1, b1, w2, b2 = weights
+        spectrum = torch.sqrt(torch.pow(rft_tensor.real, 2) + torch.pow(rft_tensor.imag, 2))
+
+        return torch.where(spectrum == torch.tensor(0.0),
+                           rft_tensor,
+                           (rft_tensor / (spectrum + 1e-16)) * (w2 * activation(w1 * spectrum + b1) + b2))
+        
+    
+        #return torch.where(spectrum == torch.tensor(0.0),
+        #                   rft_tensor,
+        #                   (rft_tensor / (spectrum + 1e-16)) * (torch.exp(weights * torch.log(1 + spectrum)) - 1))
 
     def forward(self, x):
         weights_size = (x.shape[0],) + tuple(1 for _ in range(len(self.size)))

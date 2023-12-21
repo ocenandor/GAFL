@@ -61,8 +61,9 @@ class UltrasoundDataset(object):
             pd.DataFrame(np.concatenate(data),
                          columns=['image', 'mask', 'frame', 'class']).to_csv(self.dataset_table_path, index=False)
         elif self.dataset == 'BUSI':
-            classes = sorted([name for name in os.listdir(self.data_path)])
+            classes = sorted([name for name in os.listdir(self.data_path)]) # benign, malignant, normal
             classes_dict = dict((class_type, index) for index, class_type in enumerate(classes))
+            #print(classes_dict)
             for class_type in classes:
                 class_type_path = os.path.join(self.data_path, class_type)
                 image_paths = sorted([os.path.join(class_type_path, name) for name in os.listdir(class_type_path)
@@ -100,7 +101,7 @@ class BaseDataset(Dataset):
         super(BaseDataset, self).__init__()
 
         self.dataset = os.path.splitext(dataset_table_path)[0]
-
+       
         dataset_table = pd.read_csv(dataset_table_path)
         self.dataset_table = dataset_table[dataset_table['phase'] == phase]
 
