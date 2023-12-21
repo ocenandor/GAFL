@@ -26,6 +26,7 @@ def run_epoch(model, iterator,
             if is_train:
                 optimizer.zero_grad()
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 100.0)
                 optimizer.step()
 
             epoch_loss += loss.item()
@@ -81,7 +82,7 @@ def train(model,
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), f"{model.name}.best.pth")
+            torch.save(model.state_dict(), f"weights/{model.name}.best.pth")
 
         print_metrics(epoch, train_loss, train_metrics, val_loss, val_metrics)
 

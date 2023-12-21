@@ -1,0 +1,27 @@
+data_parameters:
+  batch_size: 4
+  image_size: 256, 256
+  n_classes: 3
+model_parameters:
+  AdaptiveLayer:
+    adjustment: spectrum
+    positions: !!python/tuple
+    - 1
+  classification:
+    ResNet:
+      blocks: 3, 3, 3
+      filters: 16, 32, 64
+  denoising:
+    DnCNN:
+      num_features: 32
+      num_layers: 20
+  segmentation:
+    UNet:
+      depth: 3
+      init_features: 32
+paths:
+  data: ../data/BPUI
+  log_dir: logs_BPUI
+train_parameters:
+  epochs: 25
+  lr: 0.001
