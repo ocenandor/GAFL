@@ -13,8 +13,8 @@ Our contribution is that we try to explore the influence of inserting not one bu
 
 ### Contributors:
 
-Nikita Kurduikov, [@Pqlet](https://github.com/Pqlet)
-Pavel TIkhomirov, [@ocenandor](https://github.com/ocenandor)
+1. Nikita Kurduikov, [@Pqlet](https://github.com/Pqlet)
+2. Pavel TIkhomirov, [@ocenandor](https://github.com/ocenandor)
 
 
 ## Installation Requirements
